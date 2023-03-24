@@ -1,0 +1,39 @@
+# Load
+
+on skript load:
+    send "&8&l[&4&lSystem&8&l] &a&lAfk pool system has enabled!" to console
+       
+options:
+    afktime: 900 seconds
+
+on join:
+    if {afkpool.afk.%player%} is not set:
+        set {afkpool.afk.%player%} to false
+
+every second:
+    loop all players:
+        if world of loop-player is "afk":
+            if {afkpool.afk.%loop-player%} is true:
+                if {afktimer::%loop-player's uuid%} is greater than 0 second:
+                    remove 1 second from {afktimer::%loop-player's uuid%}
+                    send action bar "&b&lAFK &8&l»&f %{afktimer::%loop-player's uuid%}%" to loop-player
+                else if {afktimer::%loop-player's uuid%} is 0 seconds:
+                    set {afktimer::%loop-player's uuid%} to {@afktime}
+                    console command "ei give %loop-player% Token"
+
+every second:
+    loop all players:
+        if world of loop-player is "afk":
+            set {afkpool.afk.%loop-player%} to true
+
+on world change:
+    set {afkpool.afk.%player%} to false
+    set {afktimer::%player's uuid%} to {@afktime}
+
+on quit:
+    set {afkpool.afk.%player%} to false
+    set {afktimer::%player's uuid%} to {@afktime}
+
+on disconnect:
+    set {afkpool.afk.%player%} to false
+    set {afktimer::%player's uuid%} to {@afktime}
